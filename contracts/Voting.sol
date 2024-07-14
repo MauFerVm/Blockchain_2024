@@ -6,7 +6,7 @@ contract Voting {
     //accederse a traves de metodos (Encapsulamiento) y no directamente
     mapping (string => uint256) private votesReceived;
     
-    //Pensando en un votación donde la cantidad de Tokens que dispongo
+    //Pensando en un votación donde la cantidad de tokens que dispongo
     //indica el peso de mi voto agregue una variable que los representaria
     function voteForCandidate(string memory candidate, uint tokens) public {
         votesReceived[candidate] += tokens;
