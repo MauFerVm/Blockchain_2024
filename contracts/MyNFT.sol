@@ -1,65 +1,82 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
-
-// Importar las bibliotecas de OpenZeppelin para ERC721 y almacenamiento de URI
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
-// Definición del contrato MyNFT que hereda de ERC721 y ERC721URIStorage
 contract MyNFT is ERC721, ERC721URIStorage {
-    // Variable para rastrear el siguiente ID de token a acuñar
     uint public nextTokenId;
-    // Dirección del administrador del contrato
     address public admin;
 
-    // Eventos para registrar acciones importantes en la blockchain
-    event Minted(address indexed to, uint indexed tokenId, string uri);
+    event Minted(address indexed to, uint indexed tokenId, string uri, string rarity);
     event Burned(uint indexed tokenId);
 
-    // Constructor que inicializa el contrato con un nombre y símbolo
+    // Posibles rarezas
+    string[] public rarities = [
+        unicode"Común", 
+        unicode"No Común", 
+        unicode"Raro", 
+        unicode"Épico", 
+        unicode"Legendario"
+    ];
+    
+    // Probabilidades acumulativas para cada rareza
+    uint[] public rarityProbabilities = [45, 70, 85, 95, 100];
+
+    // Mapeo para almacenar la rareza de cada token
+    mapping(uint256 => string) public tokenRarities;
+
     constructor() ERC721('MyNFT', 'MNFT') {
-        // Establecer al administrador como la dirección que despliega el contrato
         admin = msg.sender;
     }
 
-    // Función para acuñar nuevos tokens NFT
+    // Función para acuñar nuevos tokens NFT con rareza aleatoria
     function mint(address to, string memory uri) external {
-        // Solo el administrador puede acuñar nuevos tokens
         require(msg.sender == admin, "only admin");
         
-        // Acuñar el nuevo token de forma segura y asignar el ID actual
         _safeMint(to, nextTokenId);
-        
-        // Establecer el URI asociado al token acuñado
         _setTokenURI(nextTokenId, uri);
         
-        // Emitir un evento para registrar la acuñación del NFT
-        emit Minted(to, nextTokenId, uri);
+        // Seleccionar una rareza aleatoria
+        string memory rarity = selectRandomRarity();
         
-        // Incrementar el ID del siguiente token a acuñar
+        // Almacenar la rareza en el mapeo
+        tokenRarities[nextTokenId] = rarity;
+        
+        emit Minted(to, nextTokenId, uri, rarity);
+        
         nextTokenId++;
     }
 
-    // Función para quemar (eliminar) un token NFT existente
-    function burn(uint256 tokenId) external {
-        // Verificar que el llamador sea el propietario del token o un operador aprobado
-        require(msg.sender == ownerOf(tokenId) || getApproved(tokenId) == msg.sender || isApprovedForAll(ownerOf(tokenId), msg.sender), "Caller is not owner nor approved");
+    // Función interna para seleccionar una rareza aleatoria basada en probabilidades
+    function selectRandomRarity() internal view returns (string memory) {
+        // Generar un número aleatorio entre 1 y 100 usando prevrandao
+        uint256 randomNumber = (uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao))) % 100) + 1;
 
-        // Emitir un evento antes de quemar el token
-        emit Burned(tokenId);
-        
-        // Llamar a la función _burn para destruir el token
-        _burn(tokenId);
+        // Determinar la rareza basada en el número aleatorio
+        for (uint i = 0; i < rarityProbabilities.length; i++) {
+            if (randomNumber <= rarityProbabilities[i]) {
+                return rarities[i];
+            }
+        }
+
+        // En caso de que no se encuentre una rareza (no debería ocurrir), retornar "Común"
+        return unicode"Común"; 
     }
 
-    // Función para verificar si el contrato soporta una interfaz específica
+    function burn(uint256 tokenId) external {
+        require(msg.sender == ownerOf(tokenId) || getApproved(tokenId) == msg.sender || isApprovedForAll(ownerOf(tokenId), msg.sender), "Caller is not owner nor approved");
+        emit Burned(tokenId);
+        _burn(tokenId);
+        
+        // Opcional: Eliminar la rareza al quemar el token
+        delete tokenRarities[tokenId];
+    }
+
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, ERC721URIStorage) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
-    // Función para obtener el URI de los metadatos de un token específico
     function tokenURI(uint tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
         return super.tokenURI(tokenId);
     }
 }
-

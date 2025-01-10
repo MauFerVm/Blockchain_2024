@@ -349,25 +349,6 @@
 			{
 				"inputs": [
 					{
-						"internalType": "uint256",
-						"name": "tokenId",
-						"type": "uint256"
-					}
-				],
-				"name": "getRarity",
-				"outputs": [
-					{
-						"internalType": "string",
-						"name": "",
-						"type": "string"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
 						"internalType": "address",
 						"name": "owner",
 						"type": "address"
@@ -786,7 +767,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/StableCoin.sol": "MyNFT"
+			"contracts/MyNFT.sol": "MyNFT"
 		},
 		"evmVersion": "cancun",
 		"libraries": {},
@@ -944,12 +925,12 @@
 				"dweb:/ipfs/QmVUSvooZKEdEdap619tcJjTLcAuH6QBdZqAzWwnAXZAWJ"
 			]
 		},
-		"contracts/StableCoin.sol": {
-			"keccak256": "0x1b0894a84ce6095dd8133e3e0e849a1624662f8f09bfa86d62a1ecb747f8da01",
+		"contracts/MyNFT.sol": {
+			"keccak256": "0x9426cf563572df897013e6740595a4458aa619ff50f8a675dfdc3a2ae05fee85",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://d27551c2dc91c9191ef9f4449ace3b49d38ba6cbe5560e37bf6095b8823c5f29",
-				"dweb:/ipfs/QmW9McZCx4au7FrVfxMHZiQ24scLLSMM8SdC4AF2ayyWza"
+				"bzz-raw://189d06353642a61931e46efb36abe1eb39dd1ef464dec482d648dc01ed51da84",
+				"dweb:/ipfs/QmWyvx7obew7oTqiKBbMpZPK2GYV8zpYLeTpqQduFTBCin"
 			]
 		}
 	},
